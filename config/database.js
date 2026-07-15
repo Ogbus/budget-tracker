@@ -1,23 +1,43 @@
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
-const { open } = require('sqlite');
 
-// 1. Determine the correct path
+// 1. Resolve the correct database file path
 const dbPath = process.env.SQLITE_DB_PATH || path.join(__dirname, '..', 'budget.db');
 
-// 2. Open and return the database connection asynchronously
-async function connectDB() {
-    const db = await open({
-        filename: dbPath,
-        driver: sqlite3.Database
-    });
+// 2. Initialize and open the database connection immediately in the outer scope
+const db = new sqlite3.Database(dbPath, (err) => {
+    if (err) {
+        console.error("Error opening database:", err);
+    } else {
+        console.log(`Connected to SQLite database at: ${dbPath}`);
+        
+        // Enable WAL mode for smooth, concurrent operations in production
+        db.run('PRAGMA journal_mode = WAL', (err) => {
+            if (err) console.error("Failed to enable WAL mode:", err);
+        });
+    }
+});
 
-    // Enable WAL mode for high performance on the cloud
-    await db.run('PRAGMA journal_mode = WAL');
+// const path = require('path');
+// const sqlite3 = require('sqlite3').verbose();
+// const { open } = require('sqlite');
+
+// // 1. Determine the correct path
+// const dbPath = process.env.SQLITE_DB_PATH || path.join(__dirname, '..', 'budget.db');
+
+// // 2. Open and return the database connection asynchronously
+// async function connectDB() {
+//     const db = await open({
+//         filename: dbPath,
+//         driver: sqlite3.Database
+//     });
+
+//     // Enable WAL mode for high performance on the cloud
+//     await db.run('PRAGMA journal_mode = WAL');
     
-    console.log(`Connected to SQLite database at: ${dbPath}`);
-    return db;
-}
+//     console.log(`Connected to SQLite database at: ${dbPath}`);
+//     return db;
+// }
 
 // const path = require('path');
 // const sqlite3 = require('sqlite3').verbose();
@@ -58,8 +78,18 @@ db.serialize(() => {
     )`);
 });
 
+// 3. Export the db instance so your models and controllers can use it immediately
+module.exports = db;
+
+// ==========================================
+// Your original schema initialization (around line 34) starts below:
+// ==========================================
+db.serialize(() => {
+    // db.run("CREATE TABLE IF NOT EXISTS...") etc.
+});
+
 // Export the connection promise
-const dbPromise = connectDB();
-module.exports = dbPromise;
+// const dbPromise = connectDB();
+// module.exports = dbPromise;
 
 // module.exports = db;
