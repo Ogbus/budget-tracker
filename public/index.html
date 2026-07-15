@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Budget Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- AUTH SECTION (Register/Login) -->
+    <div id="auth-container" class="container">
+        <h2 id="auth-title">Log In</h2>
+        <form id="auth-form">
+            <!-- Dynamic Signup Fields (Hidden by default in login mode) -->
+            <div id="signup-fields" class="hidden" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <input type="text" id="first-name" placeholder="First Name" style="width: 100%;">
+                <input type="text" id="last-name" placeholder="Last Name" style="width: 100%;">
+            </div>
+
+            <input type="email" id="email" placeholder="Email" required style="margin-bottom: 15px;">
+            <input type="password" id="password" placeholder="Password" required style="margin-bottom: 15px;">
+            
+            <button type="submit" id="auth-submit-btn">Login</button>
+        </form>
+        <p id="auth-toggle">Don't have an account? <span id="toggle-link">Register here</span></p>
+    </div>
+
+    <!-- MAIN APP DASHBOARD (Hidden by default) -->
+    <div id="dashboard-container" class="container hidden">
+        <header>
+            <h2>Welcome, <span id="user-display">User</span></h2>
+            <button id="logout-btn">Log Out</button>
+        </header>
+
+        <section class="budget-summary">
+            <h3>Total Spent: <span id="total-spent">₦0.00</span></h3>
+
+            <div class="chart-container" style="position: relative; margin: auto; height: 300px; width: 300px;">
+                <canvas id="expenseChart"></canvas>
+            </div>
+            
+            <!-- Progress Bar (Visible only when limit is greater than 0) -->
+            <div id="progress-container" class="hidden" style="margin-top: 15px; text-align: left;">
+                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px; font-weight: 500;">
+                    <span>Budget Progress</span>
+                    <span id="progress-text">0% (₦0.00 / ₦0.00)</span>
+                </div>
+                <div style="background-color: var(--border); border-radius: 10px; height: 16px; width: 100%; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
+                    <div id="progress-bar" style="background-color: var(--primary); height: 100%; width: 0%; transition: width 0.4s ease, background-color 0.4s ease;"></div>
+                </div>
+            </div>
+
+            <!-- Set/Update Budget Limit Form -->
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <input type="number" id="budget-limit-input" placeholder="Set Budget Limit (₦)" style="flex: 1; padding: 8px; font-size: 14px;">
+                <button id="set-budget-btn" style="padding: 8px 15px; font-size: 14px; margin: 0; white-space: nowrap;">Set Limit</button>
+            </div>
+        </section>
+
+        <!-- New / Edit Expense Form -->
+        <section class="add-expense">
+            <h3 id="form-title">Log New Expense</h3>
+            <form id="expense-form">
+                <!-- Hidden input to store the ID when editing -->
+                <input type="hidden" id="expense-id" value="">
+                
+                <input type="text" id="expense-desc" placeholder="What did you buy?" required>
+                <input type="number" step="0.01" id="expense-amount" placeholder="Amount (₦)" required>
+                <select id="expense-category">
+                    <option value="Food">Food</option>
+                    <option value="Rent">Rent & Bills</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Other">Other</option>
+                </select>
+                <button type="submit" id="submit-expense-btn">Add Expense</button>
+                <button type="button" id="cancel-edit-btn" class="hidden" style="background-color: #6b7280; margin-top: 5px;">Cancel Edit</button>
+            </form>
+        </section>
+
+        <!-- Expenses List -->
+        <section class="expense-history">
+            <h3>Your Expenses</h3>
+            <ul id="expense-list">
+                <!-- Javascript will inject list items here -->
+            </ul>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
