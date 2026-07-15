@@ -1,13 +1,34 @@
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
+const { open } = require('sqlite');
 
-// Use SQLITE_DB_PATH env variable if it exists (for production)
-// Fall back to local file path (for development)
+// 1. Determine the correct path
 const dbPath = process.env.SQLITE_DB_PATH || path.join(__dirname, '..', 'budget.db');
 
-const db = new sqlite3.Database(dbPath, (err) => {
-    if (err) console.error("Database opening error: ", err);
-});
+// 2. Open and return the database connection asynchronously
+async function connectDB() {
+    const db = await open({
+        filename: dbPath,
+        driver: sqlite3.Database
+    });
+
+    // Enable WAL mode for high performance on the cloud
+    await db.run('PRAGMA journal_mode = WAL');
+    
+    console.log(`Connected to SQLite database at: ${dbPath}`);
+    return db;
+}
+
+// const path = require('path');
+// const sqlite3 = require('sqlite3').verbose();
+
+// // Use SQLITE_DB_PATH env variable if it exists (for production)
+// // Fall back to local file path (for development)
+// const dbPath = process.env.SQLITE_DB_PATH || path.join(__dirname, '..', 'budget.db');
+
+// const db = new sqlite3.Database(dbPath, (err) => {
+//     if (err) console.error("Database opening error: ", err);
+// });
 
 // Create Database Tables
 db.serialize(() => {
@@ -37,4 +58,8 @@ db.serialize(() => {
     )`);
 });
 
-module.exports = db;
+// Export the connection promise
+const dbPromise = connectDB();
+module.exports = dbPromise;
+
+// module.exports = db;
