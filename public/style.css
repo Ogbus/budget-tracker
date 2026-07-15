@@ -1,3 +1,4 @@
+
 :root {
     --primary: #4f46e5;
     --primary-hover: #4338ca;
@@ -151,3 +152,107 @@ header {
     border-radius: 4px;
 }
 .btn-delete:hover { background-color: #dc2626; }
+
+/* ==========================================================
+   MOBILE RESPONSIVENESS
+   (CSS-only changes — index.html left untouched.
+   !important is used where the HTML has inline styles,
+   since inline styles otherwise beat external stylesheets.)
+   ========================================================== */
+
+/* Tablets and small laptops */
+@media (max-width: 768px) {
+    body {
+        padding: 15px;
+        align-items: flex-start; /* let tall dashboards scroll instead of clipping at the top */
+    }
+
+    .container {
+        padding: 20px;
+        max-width: 100%;
+    }
+}
+
+/* Phones */
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 16px;
+        border-radius: 8px;
+    }
+
+    h2 { font-size: 20px; }
+    h3 { font-size: 17px; }
+
+    input, select, button {
+        font-size: 16px; /* keeps iOS from auto-zooming on focus */
+        padding: 10px;
+    }
+
+    /* Signup first/last name row -> stack on narrow screens */
+    #signup-fields {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    header {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    #logout-btn {
+        width: 100%;
+    }
+
+    .budget-summary {
+        padding: 12px;
+        font-size: 17px;
+    }
+
+    /* Chart container has inline width/height of 300px */
+    .chart-container {
+        width: 100% !important;
+        max-width: 260px;
+        height: auto !important;
+        aspect-ratio: 1 / 1;
+        padding: 12px;
+    }
+
+    /* Budget limit input + button row -> stack on very narrow screens */
+    .budget-summary > div[style*="display: flex"] {
+        flex-direction: column !important;
+    }
+
+    .budget-summary > div[style*="display: flex"] button {
+        width: 100%;
+    }
+
+    #progress-text {
+        font-size: 12px;
+    }
+
+    .expense-item {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .action-buttons {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+/* Very small phones */
+@media (max-width: 340px) {
+    .chart-container {
+        max-width: 220px;
+    }
+
+    .btn-edit, .btn-delete {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+}
