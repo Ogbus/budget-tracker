@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Budget Tracker</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,6 +13,27 @@
 
     <!-- AUTH SECTION (Register/Login) -->
     <div id="auth-container" class="container">
+        <div class="brand">
+            <svg class="logo-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Budget Tracker logo">
+                <defs>
+                    <linearGradient id="logoGradAuth" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                        <stop offset="0" stop-color="#6366f1"/>
+                        <stop offset="1" stop-color="#4338ca"/>
+                    </linearGradient>
+                </defs>
+                <rect width="40" height="40" rx="10" fill="url(#logoGradAuth)"/>
+                <line x1="13" y1="10" x2="13" y2="30" stroke="#ffffff" stroke-width="3.4" stroke-linecap="round"/>
+                <line x1="27" y1="10" x2="27" y2="30" stroke="#ffffff" stroke-width="3.4" stroke-linecap="round"/>
+                <line x1="13" y1="10" x2="27" y2="30" stroke="#ffffff" stroke-width="3.4" stroke-linecap="round"/>
+                <line x1="10.5" y1="16.5" x2="29.5" y2="15" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round"/>
+                <line x1="10.5" y1="23.5" x2="29.5" y2="22" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round"/>
+                <circle cx="32" cy="32" r="9" fill="#f59e0b" stroke="#ffffff" stroke-width="2"/>
+                <rect x="27.5" y="31" width="2.2" height="4.5" rx="1" fill="#ffffff"/>
+                <rect x="30.7" y="28.5" width="2.2" height="7" rx="1" fill="#ffffff"/>
+                <rect x="33.9" y="26" width="2.2" height="9.5" rx="1" fill="#ffffff"/>
+            </svg>
+            <span class="brand-text">Budget<span class="brand-text-light"> Tracker</span></span>
+        </div>
         <h2 id="auth-title">Log In</h2>
         <form id="auth-form">
             <!-- Dynamic Signup Fields (Hidden by default in login mode) -->
@@ -30,6 +52,27 @@
 
     <!-- MAIN APP DASHBOARD (Hidden by default) -->
     <div id="dashboard-container" class="container hidden">
+        <div class="brand brand-compact">
+            <svg class="logo-icon logo-icon-sm" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Budget Tracker logo">
+                <defs>
+                    <linearGradient id="logoGradDash" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                        <stop offset="0" stop-color="#6366f1"/>
+                        <stop offset="1" stop-color="#4338ca"/>
+                    </linearGradient>
+                </defs>
+                <rect width="40" height="40" rx="10" fill="url(#logoGradDash)"/>
+                <line x1="13" y1="10" x2="13" y2="30" stroke="#ffffff" stroke-width="3.4" stroke-linecap="round"/>
+                <line x1="27" y1="10" x2="27" y2="30" stroke="#ffffff" stroke-width="3.4" stroke-linecap="round"/>
+                <line x1="13" y1="10" x2="27" y2="30" stroke="#ffffff" stroke-width="3.4" stroke-linecap="round"/>
+                <line x1="10.5" y1="16.5" x2="29.5" y2="15" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round"/>
+                <line x1="10.5" y1="23.5" x2="29.5" y2="22" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round"/>
+                <circle cx="32" cy="32" r="9" fill="#f59e0b" stroke="#ffffff" stroke-width="2"/>
+                <rect x="27.5" y="31" width="2.2" height="4.5" rx="1" fill="#ffffff"/>
+                <rect x="30.7" y="28.5" width="2.2" height="7" rx="1" fill="#ffffff"/>
+                <rect x="33.9" y="26" width="2.2" height="9.5" rx="1" fill="#ffffff"/>
+            </svg>
+            <span class="brand-text">Budget<span class="brand-text-light"> Tracker</span></span>
+        </div>
         <header>
             <h2>Welcome, <span id="user-display">User</span></h2>
             <button id="logout-btn">Log Out</button>

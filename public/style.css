@@ -153,6 +153,46 @@ header {
 }
 .btn-delete:hover { background-color: #dc2626; }
 
+.brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.brand-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+}
+
+.brand-text-light {
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.brand-compact {
+    justify-content: flex-start;
+    margin-bottom: 15px;
+}
+
+.logo-icon-sm {
+    width: 30px;
+    height: 30px;
+}
+
+.brand-compact .brand-text {
+    font-size: 16px;
+}
+
 /* ==========================================================
    MOBILE RESPONSIVENESS
    (CSS-only changes — index.html left untouched.
@@ -186,6 +226,15 @@ header {
 
     h2 { font-size: 20px; }
     h3 { font-size: 17px; }
+
+    .logo-icon {
+        width: 34px;
+        height: 34px;
+    }
+
+    .brand-text {
+        font-size: 18px;
+    }
 
     input, select, button {
         font-size: 16px; /* keeps iOS from auto-zooming on focus */
