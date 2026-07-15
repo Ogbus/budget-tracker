@@ -4,7 +4,8 @@ const authRoutes = require('./routes/authRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+// const PORT = 3000;
 
 // Middleware
 app.use(express.json());
@@ -16,7 +17,6 @@ app.use('/api', authRoutes);         // Handles /api/register, /api/login, /api/
 app.use('/api/expenses', expenseRoutes); // Handles /api/expenses, /api/expenses/:id
 
 // Start Server
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
