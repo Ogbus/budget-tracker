@@ -525,6 +525,160 @@ async function exportExpensesToCSV() {
 
 exportCsvBtn.addEventListener('click', exportExpensesToCSV);
 
+// ===== Voice quick-log =====
+const micBtn = document.getElementById('mic-btn');
+const voicePreview = document.getElementById('voice-preview');
+const voicePreviewText = document.getElementById('voice-preview-text');
+const voiceConfirmBtn = document.getElementById('voice-confirm-btn');
+const voiceEditBtn = document.getElementById('voice-edit-btn');
+
+const CATEGORY_KEYWORDS = {
+    Food: ['food', 'jollof', 'eat', 'eating', 'lunch', 'dinner', 'breakfast', 'snack', 'groceries', 'grocery', 'restaurant', 'rice', 'suya'],
+    Rent: ['rent', 'bills', 'bill', 'electricity', 'light bill', 'water', 'dstv', 'subscription'],
+    Entertainment: ['entertainment', 'movie', 'cinema', 'party', 'netflix', 'outing', 'game', 'games'],
+    Transport: ['transport', 'uber', 'bolt', 'bus', 'fuel', 'petrol', 'taxi', 'keke', 'fare']
+};
+
+const NUMBER_WORDS = {
+    zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9,
+    ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16,
+    seventeen: 17, eighteen: 18, nineteen: 19, twenty: 20, thirty: 30, forty: 40, fifty: 50,
+    sixty: 60, seventy: 70, eighty: 80, ninety: 90
+};
+const MULTIPLIER_WORDS = { hundred: 100, thousand: 1000 };
+
+function wordsToNumber(phrase) {
+    const words = phrase.toLowerCase().split(/\s+/).filter(Boolean);
+    let total = 0, current = 0, found = false;
+
+    words.forEach(word => {
+        if (word in NUMBER_WORDS) {
+            current += NUMBER_WORDS[word];
+            found = true;
+        } else if (word in MULTIPLIER_WORDS) {
+            current = (current || 1) * MULTIPLIER_WORDS[word];
+            if (word === 'thousand') { total += current; current = 0; }
+            found = true;
+        }
+    });
+
+    total += current;
+    return found ? total : null;
+}
+
+// Pulls an amount out of the transcript — digits first ("1500"), then a
+// fallback for spoken-out numbers ("fifteen hundred").
+function extractAmount(transcript) {
+    const digitMatch = transcript.match(/\d[\d,]*(\.\d+)?/);
+    if (digitMatch) {
+        return parseFloat(digitMatch[0].replace(/,/g, ''));
+    }
+
+    const words = transcript.toLowerCase().split(/\s+/);
+    let run = [];
+    for (const word of words) {
+        if (word in NUMBER_WORDS || word in MULTIPLIER_WORDS) {
+            run.push(word);
+        } else if (run.length) {
+            break;
+        }
+    }
+    return run.length ? wordsToNumber(run.join(' ')) : null;
+}
+
+function extractCategory(transcript) {
+    const lower = transcript.toLowerCase();
+    for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+        if (keywords.some(kw => lower.includes(kw))) return category;
+    }
+    return 'Other';
+}
+
+// Whatever's left after stripping the amount, filler words, and the
+// matched category keyword becomes the description.
+function extractDescription(transcript, category) {
+    let text = ` ${transcript.toLowerCase()} `;
+    text = text.replace(/\d[\d,]*(\.\d+)?/g, ' ');
+
+    const fillers = ['naira', 'ngn', '₦', 'i spent', 'spent', 'bought', 'paid', 'pay for', 'pay', 'on', 'for'];
+    fillers.forEach(word => {
+        text = text.split(` ${word} `).join(' ');
+    });
+
+    (CATEGORY_KEYWORDS[category] || []).forEach(kw => {
+        text = text.split(` ${kw} `).join(' ').split(`${kw} `).join(' ');
+    });
+
+    text = text.replace(/\s+/g, ' ').trim();
+    if (!text) text = transcript.trim();
+    return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function handleVoiceTranscript(transcript) {
+    const amount = extractAmount(transcript);
+    const category = extractCategory(transcript);
+    const description = extractDescription(transcript, category);
+
+    document.getElementById('expense-desc').value = description;
+    document.getElementById('expense-amount').value = amount !== null ? amount : '';
+    document.getElementById('expense-category').value = category;
+
+    if (amount === null) {
+        showToast("Didn't catch an amount — please fill it in.", 'error');
+    }
+
+    const nairaFormatter = new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' });
+    const amountText = amount !== null ? nairaFormatter.format(amount) : 'no amount caught';
+    voicePreviewText.textContent = `${amountText} · ${category} · ${description}`;
+    voicePreview.classList.remove('hidden');
+}
+
+const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+
+if (SpeechRecognitionAPI) {
+    recognition = new SpeechRecognitionAPI();
+    recognition.lang = 'en-NG';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = (event) => {
+        handleVoiceTranscript(event.results[0][0].transcript);
+    };
+    recognition.onerror = () => {
+        showToast("Couldn't catch that clearly — try again.");
+    };
+    recognition.onend = () => {
+        micBtn.classList.remove('listening');
+        micBtn.textContent = '🎤';
+    };
+}
+
+micBtn.addEventListener('click', () => {
+    if (!recognition) {
+        showToast("Voice input isn't supported in this browser. Try Chrome or Edge.");
+        return;
+    }
+    if (micBtn.classList.contains('listening')) {
+        recognition.stop();
+        return;
+    }
+    voicePreview.classList.add('hidden');
+    micBtn.classList.add('listening');
+    micBtn.textContent = '🎙️';
+    recognition.start();
+});
+
+voiceConfirmBtn.addEventListener('click', () => {
+    voicePreview.classList.add('hidden');
+    expenseForm.requestSubmit();
+});
+
+voiceEditBtn.addEventListener('click', () => {
+    voicePreview.classList.add('hidden');
+    document.getElementById('expense-desc').focus();
+});
+
 // Add or Edit Expense Form Submit
 expenseForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -613,6 +767,7 @@ function resetForm() {
     formTitle.textContent = "Log New Expense";
     submitExpenseBtn.textContent = "Add Expense";
     cancelEditBtn.classList.add('hidden');
+    voicePreview.classList.add('hidden');
     
     expenseIdInput.value = "";
     expenseForm.reset();

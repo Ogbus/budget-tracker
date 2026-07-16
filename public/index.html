@@ -105,7 +105,10 @@
 
         <!-- New / Edit Expense Form -->
         <section class="add-expense">
-            <h3 id="form-title">Log New Expense</h3>
+            <div class="section-header">
+                <h3 id="form-title">Log New Expense</h3>
+                <button type="button" id="mic-btn" class="btn-mic" aria-label="Log expense by voice" title="Log by voice">🎤</button>
+            </div>
             <form id="expense-form">
                 <!-- Hidden input to store the ID when editing -->
                 <input type="hidden" id="expense-id" value="">
@@ -119,6 +122,16 @@
                     <option value="Transport">Transport</option>
                     <option value="Other">Other</option>
                 </select>
+
+                <!-- Shown after a voice entry, before the expense is actually saved -->
+                <div id="voice-preview" class="voice-preview hidden">
+                    <p>🎤 Heard: <strong id="voice-preview-text"></strong></p>
+                    <div class="voice-preview-actions">
+                        <button type="button" id="voice-confirm-btn" class="btn-confirm-voice">Looks good — Add</button>
+                        <button type="button" id="voice-edit-btn" class="btn-secondary">Edit manually</button>
+                    </div>
+                </div>
+                
                 <button type="submit" id="submit-expense-btn">Add Expense</button>
                 <button type="button" id="cancel-edit-btn" class="hidden" style="background-color: #6b7280; margin-top: 5px;">Cancel Edit</button>
             </form>
