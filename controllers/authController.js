@@ -30,7 +30,20 @@ exports.register = async (req, res) => {
                 }
                 return res.status(500).json({ error: err.message });
             }
-            res.status(201).json({ message: "Registration successful!" });
+
+            // Issue a token right away so the new user lands straight on the dashboard
+            const token = jwt.sign(
+                { userId: this.lastID, email, firstName },
+                JWT_SECRET,
+                { expiresIn: '24h' }
+            );
+
+            res.status(201).json({
+                message: "Registration successful!",
+                token,
+                email,
+                firstName
+            });
         });
     } catch (e) {
         res.status(500).json({ error: "Server error during registration." });

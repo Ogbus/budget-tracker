@@ -193,6 +193,86 @@ header {
     font-size: 16px;
 }
 
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%) translateY(10px);
+    min-width: 220px;
+    max-width: calc(100% - 32px);
+    padding: 12px 18px;
+    border-radius: 8px;
+    background-color: #1f2937;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast.toast-show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+.toast.toast-success { background-color: #059669; }
+.toast.toast-error { background-color: #dc2626; }
+
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(17, 24, 39, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1100;
+}
+
+.confirm-box {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    padding: 24px;
+    width: 100%;
+    max-width: 340px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.confirm-box p {
+    margin: 0 0 20px;
+    font-size: 15px;
+    color: var(--text);
+    text-align: center;
+}
+
+.confirm-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.confirm-actions button {
+    flex: 1;
+    margin: 0;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.btn-secondary {
+    background-color: #e5e7eb;
+    color: var(--text);
+}
+.btn-secondary:hover { background-color: #d1d5db; }
+
+.btn-delete-solid {
+    background-color: #ef4444;
+}
+.btn-delete-solid:hover { background-color: #dc2626; }
+
 /* ==========================================================
    MOBILE RESPONSIVENESS
    (CSS-only changes — index.html left untouched.

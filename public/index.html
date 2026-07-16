@@ -133,6 +133,20 @@
         </section>
     </div>
 
+    <!-- In-app notification (replaces window.alert) -->
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <!-- In-app confirmation dialog (replaces window.confirm) -->
+    <div id="confirm-overlay" class="confirm-overlay hidden">
+        <div class="confirm-box" role="alertdialog" aria-modal="true" aria-labelledby="confirm-message">
+            <p id="confirm-message">Are you sure?</p>
+            <div class="confirm-actions">
+                <button type="button" id="confirm-cancel-btn" class="btn-secondary">Cancel</button>
+                <button type="button" id="confirm-ok-btn" class="btn-delete-solid">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>

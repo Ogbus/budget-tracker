@@ -148,16 +148,50 @@ function updateChart(expenses) {
         });
     }
 }
-// Check token on page load
-document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('token');
-    const userEmail = localStorage.getItem('userEmail');
 
-    if (token && userEmail) {
-        showDashboard(userEmail);
-    } else {
-        showAuth();
+// In-app notification (replaces window.alert)
+const toastEl = document.getElementById('toast');
+let toastTimeout = null;
+
+function showToast(message, type = 'error') {
+    clearTimeout(toastTimeout);
+
+    toastEl.textContent = message;
+    toastEl.className = `toast toast-show toast-${type}`;
+
+    toastTimeout = setTimeout(() => {
+        toastEl.className = 'toast';
+    }, 3500);
+}
+
+// In-app confirmation dialog (replaces window.confirm)
+const confirmOverlay = document.getElementById('confirm-overlay');
+const confirmMessage = document.getElementById('confirm-message');
+const confirmOkBtn = document.getElementById('confirm-ok-btn');
+const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+let confirmResolve = null;
+
+function showConfirm(message) {
+    confirmMessage.textContent = message;
+    confirmOverlay.classList.remove('hidden');
+
+    return new Promise((resolve) => {
+        confirmResolve = resolve;
+    });
+}
+
+function closeConfirm(result) {
+    confirmOverlay.classList.add('hidden');
+    if (confirmResolve) {
+        confirmResolve(result);
+        confirmResolve = null;
     }
+}
+
+confirmOkBtn.addEventListener('click', () => closeConfirm(true));
+confirmCancelBtn.addEventListener('click', () => closeConfirm(false));
+confirmOverlay.addEventListener('click', (e) => {
+    if (e.target === confirmOverlay) closeConfirm(false);
 });
 
 // Password validation regex
@@ -225,19 +259,20 @@ authForm.addEventListener('submit', async (e) => {
 
         if (!response.ok) throw new Error(data.error || 'Authentication failed.');
 
+        // Save token and first name, then go straight to the dashboard —
+        // this now runs for BOTH login and registration, since the backend
+        // issues a token on signup too.
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user_name', data.firstName);
+
         if (isLoginMode) {
-            // Save token and first name in localStorage
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user_name', data.firstName); // Save first name!
-            
-            showDashboard(data.firstName); // Greet with first name
+            showDashboard(data.firstName);
         } else {
-            alert("Registration successful! Please log in.");
-            isLoginMode = true;
-            authToggle.click(); // Switch back to login view
+            showToast(`Welcome, ${data.firstName}! Your account is ready.`, 'success');
+            showDashboard(data.firstName);
         }
     } catch (err) {
-        alert(err.message);
+        showToast(err.message);
     }
 });
 
@@ -308,7 +343,7 @@ setBudgetBtn.addEventListener('click', async () => {
         
         loadExpenses(); // Re-render progress bar
     } catch (err) {
-        alert(err.message);
+        showToast(err.message);
     }
 });
 
@@ -363,7 +398,7 @@ async function loadExpenses() {
         });
 
         if (response.status === 401) {
-            alert("Session expired. Please log in again.");
+            showToast("Session expired. Please log in again.");
             logoutBtn.click();
             return;
         }
@@ -443,7 +478,7 @@ expenseForm.addEventListener('submit', async (e) => {
         });
 
         if (response.status === 401) {
-            alert("Session expired. Please log in again.");
+            showToast("Session expired. Please log in again.");
             logoutBtn.click();
             return;
         }
@@ -453,13 +488,14 @@ expenseForm.addEventListener('submit', async (e) => {
         resetForm();
         loadExpenses(); // Refresh list & running total
     } catch (err) {
-        alert(err.message);
+        showToast(err.message);
     }
 });
 
 // Delete an Expense
 async function deleteExpense(id) {
-    if (!confirm("Are you sure you want to delete this expense?")) return;
+    const confirmed = await showConfirm("Are you sure you want to delete this expense?");
+    if (!confirmed) return;
 
     const token = localStorage.getItem('token');
     if (!token) return showAuth();
@@ -474,7 +510,7 @@ async function deleteExpense(id) {
         
         loadExpenses();
     } catch (err) {
-        alert(err.message);
+        showToast(err.message);
     }
 }
 
