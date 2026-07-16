@@ -126,12 +126,18 @@
 
         <!-- Expenses List -->
         <section class="expense-history">
-            <h3>Your Expenses</h3>
+            <div class="section-header">
+                <h3>Your Expenses</h3>
+                <button type="button" id="export-csv-btn" class="btn-export">Export CSV</button>
+            </div>
             <ul id="expense-list">
                 <!-- Javascript will inject list items here -->
             </ul>
         </section>
     </div>
+
+    <!-- Dark mode toggle (visible on both screens) -->
+    <button type="button" id="theme-toggle-btn" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
 
     <!-- In-app notification (replaces window.alert) -->
     <div id="toast" class="toast" role="status" aria-live="polite"></div>

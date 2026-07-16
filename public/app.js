@@ -149,6 +149,24 @@ function updateChart(expenses) {
     }
 }
 
+// Dark mode
+const themeToggleBtn = document.getElementById('theme-toggle-btn');
+
+function applyTheme(theme) {
+    document.body.classList.toggle('dark-mode', theme === 'dark');
+    themeToggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    localStorage.setItem('theme', theme);
+}
+
+const savedTheme = localStorage.getItem('theme')
+    || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+applyTheme(savedTheme);
+
+themeToggleBtn.addEventListener('click', () => {
+    const isDark = document.body.classList.contains('dark-mode');
+    applyTheme(isDark ? 'light' : 'dark');
+});
+
 // In-app notification (replaces window.alert)
 const toastEl = document.getElementById('toast');
 let toastTimeout = null;
@@ -448,6 +466,64 @@ async function loadExpenses() {
         console.error(err);
     }
 }
+
+// Export expenses to a downloadable CSV file
+const exportCsvBtn = document.getElementById('export-csv-btn');
+
+async function exportExpensesToCSV() {
+    const token = localStorage.getItem('token');
+    if (!token) return showAuth();
+
+    try {
+        const response = await fetch('/api/expenses', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.status === 401) {
+            showToast("Session expired. Please log in again.");
+            logoutBtn.click();
+            return;
+        }
+
+        if (!response.ok) throw new Error('Could not export expenses.');
+        const expenses = await response.json();
+
+        if (!expenses.length) {
+            showToast("No expenses to export yet.", 'error');
+            return;
+        }
+
+        const csvEscape = (value) => `"${String(value).replace(/"/g, '""')}"`;
+        const header = ['Date', 'Description', 'Category', 'Amount (NGN)'];
+        const rows = expenses.map(exp => [
+            exp.date ? new Date(exp.date).toLocaleString('en-NG') : '',
+            exp.description,
+            exp.category,
+            exp.amount
+        ]);
+
+        const csvContent = [header, ...rows]
+            .map(row => row.map(csvEscape).join(','))
+            .join('\r\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `budget-tracker-expenses-${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        showToast("Expenses exported!", 'success');
+    } catch (err) {
+        showToast(err.message);
+    }
+}
+
+exportCsvBtn.addEventListener('click', exportExpensesToCSV);
 
 // Add or Edit Expense Form Submit
 expenseForm.addEventListener('submit', async (e) => {
